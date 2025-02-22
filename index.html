@@ -216,7 +216,28 @@
       cursor: pointer;
     }
     #uno-back:hover { opacity: 0.9; }
-    #uno-discard { margin-bottom: 20px; }
+    /* تعديل ترتيب قسم UNO: وضع الخصمين على الجانبين وزر السحب في الوسط */
+    #uno-hands {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-top: 20px;
+      flex-wrap: nowrap;
+    }
+    #opponent-hand, #player-hand {
+      width: 30%;
+    }
+    #uno-deck-center {
+      width: 30%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #uno-deck-center > #uno-deck,
+    #uno-deck-center > #uno-discard {
+      margin-bottom: 20px;
+    }
     #discard-pile {
       margin: auto;
       width: 80px;
@@ -228,20 +249,6 @@
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       border: 2px solid #ddd;
-    }
-    #uno-deck { margin-bottom: 20px; }
-    #uno-hands {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-    #opponent-hand, #player-hand { width: 45%; }
-    #opponent-cards, #player-cards {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
     }
     .uno-card {
       width: 100px;
@@ -293,7 +300,12 @@
       #scoreboard { grid-template-columns: 1fr; }
       .board { max-width: 100%; }
       #uno-settings, #uno-gameArea { width: 100%; }
-      #opponent-hand, #player-hand { width: 100%; }
+      #uno-hands {
+        flex-direction: column;
+      }
+      #opponent-hand, #player-hand, #uno-deck-center {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -385,17 +397,19 @@
       </div>
       <div id="uno-gameArea" style="display:none;">
         <button id="uno-back">رجوع للإعدادات</button>
-        <div id="uno-discard">
-          <h2>الورقة الحالية</h2>
-          <div id="discard-pile" class="uno-card"></div>
-        </div>
-        <div id="uno-deck">
-          <button id="draw-card">اسحب ورقة (<span id="deck-count"></span>)</button>
-        </div>
         <div id="uno-hands">
           <div id="opponent-hand">
             <h3>يد الخصم</h3>
             <div id="opponent-cards"></div>
+          </div>
+          <div id="uno-deck-center">
+            <div id="uno-deck">
+              <button id="draw-card">اسحب ورقة (<span id="deck-count"></span>)</button>
+            </div>
+            <div id="uno-discard">
+              <h2>الورقة الحالية</h2>
+              <div id="discard-pile" class="uno-card"></div>
+            </div>
           </div>
           <div id="player-hand">
             <h3>يدك</h3>
