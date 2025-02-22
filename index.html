@@ -32,6 +32,8 @@
       padding: 20px;
       position: fixed;
       height: 100vh;
+      top: 0;
+      right: 0;
     }
     .sidebar h2 {
       text-align: center;
@@ -187,7 +189,7 @@
     }
     .cell:not(.taken) { animation: cellPop 0.3s ease; }
     
-    /* أنماط لعبة UNO (من الكود الأصلي) */
+    /* أنماط لعبة UNO */
     #uno-settings {
       max-width: 500px;
       margin: 0 auto 20px;
@@ -232,6 +234,7 @@
       display: flex;
       justify-content: space-around;
       margin-top: 20px;
+      flex-wrap: wrap;
     }
     #opponent-hand, #player-hand { width: 45%; }
     #opponent-cards, #player-cards {
@@ -271,6 +274,27 @@
     .blue { background: linear-gradient(145deg, #82b1ff, #448aff); color: white; }
     .green { background: linear-gradient(145deg, #b9f6ca, #69f0ae); color: white; }
     .yellow { background: linear-gradient(145deg, #ffff8d, #ffea00); color: black; }
+
+    /* استجابة الأجهزة الصغيرة */
+    @media screen and (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+        right: 0;
+        padding: 10px;
+      }
+      .main-content {
+        margin-right: 0;
+        padding: 15px;
+      }
+      #scoreboard { grid-template-columns: 1fr; }
+      .board { max-width: 100%; }
+      #uno-settings, #uno-gameArea { width: 100%; }
+      #opponent-hand, #player-hand { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -680,7 +704,7 @@
     });
   </script>
   
-  <!-- سكربت لعبة UNO (الكود الأصلي مع بعض التعديلات لتفعيل التبديل) -->
+  <!-- سكربت لعبة UNO -->
   <script>
     function initUNO() {
       document.querySelectorAll('#uno-settings input[name="uno-mode"]').forEach(radio => {
