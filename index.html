@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الألعاب - XO و UNO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* أنماط عامة */
+    :root {
+      --primary: #2c3e50;
+      --secondary: #3498db;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --text: #333;
+      --background: #f4f4f4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      direction: rtl;
+    }
+    /* القائمة الجانبية */
+    .sidebar {
+      width: 250px;
+      background: var(--primary);
+      color: white;
+      padding: 20px;
+      position: fixed;
+      height: 100vh;
+    }
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar li { margin: 15px 0; }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .sidebar a:hover { background: rgba(255,255,255,0.1); }
+    /* المحتوى الرئيسي */
+    .main-content {
+      margin-right: 250px;
+      padding: 30px;
+      flex: 1;
+    }
+    .game-container { display: none; }
+    .game-container.active { display: block; }
+    
+    /* أنماط لعبة XO */
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+    header.xo-header {
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    header.xo-header h1 { margin: 0; font-size: 2.5em; }
+    #scoreboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #34495e;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    #gameOptions {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #gameOptions label { margin-right: 5px; }
+    #gameOptions select {
+      padding: 5px;
+      font-size: 1em;
+      margin: 0 10px;
+    }
+    #status { text-align: center; font-size: 1.5em; margin-bottom: 20px; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      background: #424852;
+      padding: 5px;
+      border-radius: 10px;
+      max-width: 320px;
+      margin: 0 auto 20px;
+    }
+    .cell {
+      background: #ecf0f1;
+      height: 100px;
+      font-size: 3.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #2c3e50;
+      border-radius: 5px;
+    }
+    .cell:hover {
+      background: #bdc3c7;
+      transform: rotate(3deg) scale(1.1);
+    }
+    .cell.taken { cursor: not-allowed; }
+    .cell.winning { background: #2ecc71; color: white; }
+    .buttons {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .buttons button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .buttons button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.2);
+    }
+    .btn-new { background: #3498db; color: #fff; }
+    .btn-reset { background: #e74c3c; color: #fff; }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3em;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .overlay.win {
+      background: rgba(46, 204, 113, 0.9);
+      color: white;
+      animation: animateOverlay 2s ease;
+    }
+    .overlay.lose {
+      background: rgba(231, 76, 60, 0.9);
+      color: white;
+      animation: animateOverlay 2s ease;
+    }
+    .overlay.draw {
+      background: rgba(255, 165, 0, 0.9);
+      color: white;
+      animation: animateOverlay 2s ease;
+    }
+    @keyframes animateOverlay {
+      0% { transform: scale(0.5); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes cellPop {
+      0% { transform: scale(0); }
+      90% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .cell:not(.taken) { animation: cellPop 0.3s ease; }
+    
+    /* أنماط لعبة UNO (من الكود الأصلي) */
+    #uno-settings {
+      max-width: 500px;
+      margin: 0 auto 20px;
+      text-align: center;
+      padding: 10px;
+      background: #eee;
+      border-radius: 8px;
+    }
+    #uno-settings label { margin: 0 5px; font-size: 1em; }
+    #uno-settings select,
+    #uno-settings button {
+      margin: 10px 0;
+      padding: 5px 10px;
+      font-size: 1em;
+    }
+    #uno-gameArea { text-align: center; }
+    #uno-back {
+      margin-bottom: 10px;
+      padding: 8px 16px;
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #uno-back:hover { opacity: 0.9; }
+    #uno-discard { margin-bottom: 20px; }
+    #discard-pile {
+      margin: auto;
+      width: 80px;
+      height: 120px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border: 2px solid #ddd;
+    }
+    #uno-deck { margin-bottom: 20px; }
+    #uno-hands {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    #opponent-hand, #player-hand { width: 45%; }
+    #opponent-cards, #player-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .uno-card {
+      width: 100px;
+      height: 140px;
+      border-radius: 10px;
+      margin: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(145deg, #ffffff, #dcdcdc);
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid #bbb;
+      position: relative;
+      font-size: 1.5em;
+    }
+    .uno-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: rgba(255,255,255,0.4);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .red { background: linear-gradient(145deg, #ff8a80, #ff5252); color: white; }
+    .blue { background: linear-gradient(145deg, #82b1ff, #448aff); color: white; }
+    .green { background: linear-gradient(145deg, #b9f6ca, #69f0ae); color: white; }
+    .yellow { background: linear-gradient(145deg, #ffff8d, #ffea00); color: black; }
+  </style>
+</head>
+<body>
+  <!-- القائمة الجانبية -->
+  <nav class="sidebar">
+    <h2>الألعاب</h2>
+    <ul>
+      <li><a href="#x-o">لعبة X و O</a></li>
+      <li><a href="#uno">لعبة UNO</a></li>
+    </ul>
+  </nav>
+
+  <!-- المحتوى الرئيسي -->
+  <main class="main-content">
+    <!-- قسم لعبة XO -->
+    <section id="x-o" class="game-container active">
+      <div class="container">
+        <header class="xo-header">
+          <h1>لعبة X و O</h1>
+        </header>
+        <div id="scoreboard">
+          <div>لاعب X: <span id="scoreX">0</span></div>
+          <div>الوقت المتبقي: <span id="timer">30</span></div>
+          <div>لاعب O: <span id="scoreO">0</span></div>
+        </div>
+        <div id="gameOptions">
+          <label for="modeSelect">وضع اللعبة:</label>
+          <select id="modeSelect" onchange="toggleDifficulty()">
+            <option value="pvp">لاعب ضد لاعب</option>
+            <option value="bot">لاعب ضد البوت</option>
+            <option value="online">لاعب ضد شخص انلاين</option>
+          </select>
+          <span id="difficultyContainer" style="display:none;">
+            <label for="difficultySelect">مستوى البوت:</label>
+            <select id="difficultySelect">
+              <option value="سهل">سهل</option>
+              <option value="متوسط">متوسط</option>
+              <option value="صعب">صعب</option>
+            </select>
+          </span>
+        </div>
+        <!-- قائمة اللاعبين المتصلين في وضع الأونلاين -->
+        <div id="onlinePlayers" style="display:none;">
+          <h2>اللاعبون المتصلون</h2>
+          <ul id="onlinePlayersList">
+            <!-- تعبئة ديناميكية -->
+          </ul>
+        </div>
+        <div id="status">دور اللاعب X</div>
+        <div class="board" id="board"></div>
+        <div class="buttons">
+          <button class="btn-new" onclick="newGame()">لعبة جديدة</button>
+          <button class="btn-reset" onclick="resetScores()">إعادة ضبط النتائج</button>
+        </div>
+      </div>
+      <!-- طبقات الأنميشن -->
+      <div id="lostOverlay" class="overlay lose">لقد خسرت!</div>
+      <div id="winOverlay" class="overlay win">لقد فزت!</div>
+      <div id="drawOverlay" class="overlay draw">التعادل!</div>
+      <!-- نافذة الدعوة -->
+      <div id="invitationOverlay">تم إرسال الدعوة!</div>
+    </section>
+
+    <!-- قسم لعبة UNO -->
+    <section id="uno" class="game-container">
+      <h1>لعبة UNO</h1>
+      <div id="uno-settings">
+        <label>
+          <input type="radio" name="uno-mode" value="bot" checked>
+          لعب ضد الحاسوب
+        </label>
+        <label>
+          <input type="radio" name="uno-mode" value="human">
+          لعب ضد شخص
+        </label>
+        <br>
+        <div id="uno-bot-difficulty">
+          <label>
+            مستوى الحاسوب:
+            <select id="uno-difficulty">
+              <option value="easy">سهل</option>
+              <option value="medium">متوسط</option>
+              <option value="hard">صعب</option>
+            </select>
+          </label>
+        </div>
+        <button id="uno-startGame">ابدأ اللعبة</button>
+      </div>
+      <div id="uno-gameArea" style="display:none;">
+        <button id="uno-back">رجوع للإعدادات</button>
+        <div id="uno-discard">
+          <h2>الورقة الحالية</h2>
+          <div id="discard-pile" class="uno-card"></div>
+        </div>
+        <div id="uno-deck">
+          <button id="draw-card">اسحب ورقة (<span id="deck-count"></span>)</button>
+        </div>
+        <div id="uno-hands">
+          <div id="opponent-hand">
+            <h3>يد الخصم</h3>
+            <div id="opponent-cards"></div>
+          </div>
+          <div id="player-hand">
+            <h3>يدك</h3>
+            <div id="player-cards"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- سكربت التبديل بين الأقسام -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.sidebar a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('href').substring(1);
+          document.querySelectorAll('.game-container').forEach(gc => gc.classList.remove('active'));
+          document.getElementById(target).classList.add('active');
+        });
+      });
+    });
+  </script>
+  
+  <!-- سكربتات لعبة XO -->
+  <script>
+    // المتغيرات الأساسية للعبة XO
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let winningCombinationFound = null;
+    let scoreX = 0, scoreO = 0, scoreDraw = 0;
+    let gameMode = "pvp";
+    let botDifficulty = "سهل";
+    const winningCombinations = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+    let timeLeft = 30, timerInterval;
+    
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 30;
+      document.getElementById('timer').textContent = timeLeft;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft;
+        if(timeLeft <= 0) { clearInterval(timerInterval); handleTimeout(); }
+      }, 1000);
+    }
+    
+    function handleTimeout() {
+      gameActive = false;
+      document.getElementById("status").textContent = "انتهى الوقت!";
+      if(currentPlayer === 'X') scoreO++;
+      else scoreX++;
+      updateScoreDisplay();
+      document.getElementById("status").textContent += " سيتم بدء لعبة جديدة تلقائيًا...";
+      setTimeout(newGame, 3000);
+    }
+    
+    function renderBoard() {
+      const boardElement = document.getElementById("board");
+      boardElement.innerHTML = '';
+      board.forEach((cell, index) => {
+        const cellElement = document.createElement("div");
+        cellElement.classList.add("cell");
+        cellElement.textContent = cell;
+        if(winningCombinationFound && winningCombinationFound.includes(index)) {
+          cellElement.classList.add("winning");
+        }
+        cellElement.addEventListener("click", () => cellClicked(index));
+        if(cell !== '') cellElement.classList.add("taken");
+        boardElement.appendChild(cellElement);
+      });
+    }
+    
+    function cellClicked(index) {
+      if(board[index] !== '' || !gameActive) return;
+      if(gameMode === "bot" && currentPlayer !== 'X') return;
+      board[index] = currentPlayer;
+      checkWinner();
+      renderBoard();
+      if(gameActive) {
+        if(gameMode === "bot") {
+          currentPlayer = 'O';
+          document.getElementById("status").textContent = "دور البوت";
+          setTimeout(botMove, 500);
+        } else {
+          currentPlayer = (currentPlayer === 'X') ? 'O' : 'X';
+          document.getElementById("status").textContent = `دور اللاعب ${currentPlayer}`;
+        }
+      }
+    }
+    
+    function checkWinner() {
+      for(let combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if(board[a] && board[a] === board[b] && board[a] === board[c]) {
+          gameActive = false;
+          winningCombinationFound = combination;
+          document.getElementById("status").textContent = `الفائز هو ${board[a]}!`;
+          updateScore(board[a]);
+          if(gameMode === "bot") {
+            if(board[a] === 'X') setTimeout(showWinAnimation, 500);
+            else if(board[a] === 'O') setTimeout(showLostAnimation, 500);
+          }
+          document.getElementById("status").textContent += " سيتم بدء لعبة جديدة تلقائيًا...";
+          setTimeout(newGame, 3000);
+          return;
+        }
+      }
+      if(!board.includes('')) {
+        gameActive = false;
+        document.getElementById("status").textContent = "التعادل!";
+        updateScore('draw');
+        showDrawAnimation();
+        document.getElementById("status").textContent += " سيتم بدء لعبة جديدة تلقائيًا...";
+        setTimeout(newGame, 3000);
+      }
+    }
+    
+    function updateScore(winner) {
+      if(winner === 'X') { scoreX++; document.getElementById("scoreX").textContent = scoreX; }
+      else if(winner === 'O') { scoreO++; document.getElementById("scoreO").textContent = scoreO; }
+      else if(winner === 'draw') { scoreDraw++; }
+      localStorage.setItem('ticTacToeScores', JSON.stringify({ X: scoreX, O: scoreO, draw: scoreDraw }));
+    }
+    
+    function updateScoreDisplay() {
+      document.getElementById("scoreX").textContent = scoreX;
+      document.getElementById("scoreO").textContent = scoreO;
+    }
+    
+    function newGame() {
+      clearInterval(timerInterval);
+      gameMode = document.getElementById("modeSelect").value;
+      if(gameMode === "bot") { botDifficulty = document.getElementById("difficultySelect").value; }
+      board = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      gameActive = true;
+      winningCombinationFound = null;
+      document.getElementById("status").textContent = (gameMode === "online") ? "انتظار قبول الدعوة..." : "دور اللاعب X";
+      renderBoard();
+      if(gameMode !== "online") startTimer();
+    }
+    
+    function resetScores() {
+      scoreX = scoreO = scoreDraw = 0;
+      updateScoreDisplay();
+      localStorage.removeItem('ticTacToeScores');
+      newGame();
+    }
+    
+    function botMove() {
+      if(!gameActive) return;
+      let move;
+      if(botDifficulty === 'سهل') move = getRandomMove();
+      else if(botDifficulty === 'متوسط') move = mediumBotMove();
+      else if(botDifficulty === 'صعب') move = bestMove();
+      board[move] = 'O';
+      checkWinner();
+      if(gameActive) { currentPlayer = 'X'; document.getElementById("status").textContent = "دور اللاعب X"; }
+      renderBoard();
+    }
+    
+    function getAvailableMoves(bd = board) {
+      let moves = [];
+      for(let i = 0; i < bd.length; i++) { if(bd[i] === '') moves.push(i); }
+      return moves;
+    }
+    
+    function getRandomMove() {
+      let moves = getAvailableMoves();
+      return moves[Math.floor(Math.random() * moves.length)];
+    }
+    
+    function mediumBotMove() {
+      let moves = getAvailableMoves();
+      for(let i = 0; i < moves.length; i++) {
+        let idx = moves[i];
+        board[idx] = 'O';
+        if(checkWinnerForBoard(board) === 'O') { board[idx] = ''; return idx; }
+        board[idx] = '';
+      }
+      for(let i = 0; i < moves.length; i++) {
+        let idx = moves[i];
+        board[idx] = 'X';
+        if(checkWinnerForBoard(board) === 'X') { board[idx] = ''; return idx; }
+        board[idx] = '';
+      }
+      return getRandomMove();
+    }
+    
+    function bestMove() {
+      let bestScore = -Infinity, move;
+      let moves = getAvailableMoves();
+      for(let i = 0; i < moves.length; i++) {
+        let idx = moves[i];
+        board[idx] = 'O';
+        let score = minimax(board, 0, false);
+        board[idx] = '';
+        if(score > bestScore) { bestScore = score; move = idx; }
+      }
+      return move;
+    }
+    
+    function minimax(bd, depth, isMaximizing) {
+      let result = checkWinnerForBoard(bd);
+      if(result !== null) {
+        if(result === 'O') return 10 - depth;
+        else if(result === 'X') return depth - 10;
+        else if(result === 'draw') return 0;
+      }
+      if(isMaximizing) {
+        let bestScore = -Infinity;
+        let moves = getAvailableMoves(bd);
+        for(let i = 0; i < moves.length; i++) {
+          bd[moves[i]] = 'O';
+          let score = minimax(bd, depth + 1, false);
+          bd[moves[i]] = '';
+          bestScore = Math.max(score, bestScore);
+        }
+        return bestScore;
+      } else {
+        let bestScore = Infinity;
+        let moves = getAvailableMoves(bd);
+        for(let i = 0; i < moves.length; i++) {
+          bd[moves[i]] = 'X';
+          let score = minimax(bd, depth + 1, true);
+          bd[moves[i]] = '';
+          bestScore = Math.min(score, bestScore);
+        }
+        return bestScore;
+      }
+    }
+    
+    function checkWinnerForBoard(bd) {
+      for(let combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if(bd[a] && bd[a] === bd[b] && bd[a] === bd[c]) return bd[a];
+      }
+      if(!bd.includes('')) return 'draw';
+      return null;
+    }
+    
+    function toggleDifficulty() {
+      let mode = document.getElementById("modeSelect").value;
+      let diffContainer = document.getElementById("difficultyContainer");
+      let onlinePlayersDiv = document.getElementById("onlinePlayers");
+      if(mode === "bot") { diffContainer.style.display = "inline"; onlinePlayersDiv.style.display = "none"; }
+      else if(mode === "online") { diffContainer.style.display = "none"; onlinePlayersDiv.style.display = "block"; updateOnlinePlayers(); }
+      else { diffContainer.style.display = "none"; onlinePlayersDiv.style.display = "none"; }
+    }
+    
+    function showLostAnimation() {
+      const lostOverlay = document.getElementById("lostOverlay");
+      lostOverlay.classList.add("active");
+      setTimeout(() => { lostOverlay.classList.remove("active"); }, 2000);
+    }
+    
+    function showWinAnimation() {
+      const winOverlay = document.getElementById("winOverlay");
+      winOverlay.classList.add("active");
+      setTimeout(() => { winOverlay.classList.remove("active"); }, 2000);
+    }
+    
+    function showDrawAnimation() {
+      const drawOverlay = document.getElementById("drawOverlay");
+      drawOverlay.classList.add("active");
+      setTimeout(() => { drawOverlay.classList.remove("active"); }, 2000);
+    }
+    
+    function updateOnlinePlayers() {
+      const players = ["أحمد", "سارة", "محمد"];
+      const list = document.getElementById("onlinePlayersList");
+      list.innerHTML = "";
+      players.forEach(player => {
+        let li = document.createElement("li");
+        li.textContent = player;
+        let inviteBtn = document.createElement("button");
+        inviteBtn.textContent = "دعوة";
+        inviteBtn.onclick = function() { sendInvitation(player); };
+        li.appendChild(inviteBtn);
+        list.appendChild(li);
+      });
+    }
+    
+    function sendInvitation(player) {
+      const invitationOverlay = document.getElementById("invitationOverlay");
+      invitationOverlay.textContent = "تم إرسال الدعوة إلى " + player;
+      invitationOverlay.classList.add("active");
+      setTimeout(() => { invitationOverlay.classList.remove("active"); }, 3000);
+    }
+    
+    window.addEventListener('load', () => {
+      const savedScores = JSON.parse(localStorage.getItem('ticTacToeScores'));
+      if(savedScores) {
+        scoreX = savedScores.X || 0;
+        scoreO = savedScores.O || 0;
+        scoreDraw = savedScores.draw || 0;
+        updateScoreDisplay();
+      }
+      renderBoard();
+    });
+  </script>
+  
+  <!-- سكربت لعبة UNO (الكود الأصلي مع بعض التعديلات لتفعيل التبديل) -->
+  <script>
+    function initUNO() {
+      document.querySelectorAll('#uno-settings input[name="uno-mode"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          UNOGame.mode = document.querySelector('input[name="uno-mode"]:checked').value;
+          const botDiff = document.getElementById("uno-bot-difficulty");
+          botDiff.style.display = (UNOGame.mode === "bot") ? "block" : "none";
+        });
+      });
+      document.getElementById("uno-difficulty").addEventListener("change", (e) => {
+        UNOGame.difficulty = e.target.value;
+      });
+      document.getElementById("uno-startGame").addEventListener("click", () => { UNOGame.startGame(); });
+      document.getElementById("draw-card").addEventListener("click", () => {
+        if(UNOGame.isCurrentPlayerHuman()){
+          UNOGame.drawCard(UNOGame.currentPlayer);
+          UNOGame.updateUI();
+        }
+      });
+      document.getElementById("uno-back").addEventListener("click", () => { UNOGame.backToSettings(); });
+    }
+    
+    const UNOGame = {
+      deck: [],
+      players: [[], []],
+      discardPile: [],
+      currentPlayer: 0,
+      mode: "bot",
+      difficulty: "easy",
+      init() { initUNO(); },
+      startGame() {
+        document.getElementById("uno-settings").style.display = "none";
+        document.getElementById("uno-gameArea").style.display = "block";
+        this.deck = this.generateDeck();
+        this.shuffle(this.deck);
+        this.players = [[], []];
+        for(let i = 0; i < 7; i++){
+          this.players[0].push(this.deck.pop());
+          this.players[1].push(this.deck.pop());
+        }
+        let firstCard = this.deck.pop();
+        this.discardPile = [firstCard];
+        this.currentPlayer = 0;
+        this.updateUI();
+        if(!this.isCurrentPlayerHuman()){
+          setTimeout(() => this.botMove(), 1000);
+        }
+      },
+      backToSettings() {
+        document.getElementById("uno-settings").style.display = "block";
+        document.getElementById("uno-gameArea").style.display = "none";
+        this.deck = [];
+        this.players = [[], []];
+        this.discardPile = [];
+        this.currentPlayer = 0;
+      },
+      generateDeck() {
+        const colors = ["red", "blue", "green", "yellow"];
+        const numbers = ["0","1","2","3","4","5","6","7","8","9"];
+        const specials = ["Skip", "Reverse", "+2"];
+        let deck = [];
+        colors.forEach(color => {
+          deck.push({color: color, value: "0"});
+          for(let i = 1; i < numbers.length; i++){
+            deck.push({color: color, value: numbers[i]});
+            deck.push({color: color, value: numbers[i]});
+          }
+          specials.forEach(special => {
+            deck.push({color: color, value: special});
+            deck.push({color: color, value: special});
+          });
+        });
+        return deck;
+      },
+      shuffle(deck) {
+        for (let i = deck.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+      },
+      updateUI() {
+        document.getElementById("deck-count").textContent = this.deck.length;
+        const topCard = this.discardPile[this.discardPile.length - 1];
+        const discardElem = document.getElementById("discard-pile");
+        discardElem.textContent = topCard.value;
+        discardElem.className = "uno-card " + topCard.color;
+        const playerCardsDiv = document.getElementById("player-cards");
+        playerCardsDiv.innerHTML = "";
+        this.players[0].forEach((card, index) => {
+          const cardElem = document.createElement("div");
+          cardElem.className = "uno-card " + card.color;
+          cardElem.textContent = card.value;
+          cardElem.addEventListener("click", () => { if(this.isCurrentPlayerHuman()){ this.playCard(0, index); } });
+          playerCardsDiv.appendChild(cardElem);
+        });
+        const opponentCardsDiv = document.getElementById("opponent-cards");
+        opponentCardsDiv.innerHTML = "";
+        if(this.mode === "bot"){
+          for(let i = 0; i < this.players[1].length; i++){
+            const cardElem = document.createElement("div");
+            cardElem.className = "uno-card";
+            cardElem.style.background = "#555";
+            cardElem.textContent = "?";
+            opponentCardsDiv.appendChild(cardElem);
+          }
+        } else {
+          this.players[1].forEach(card => {
+            const cardElem = document.createElement("div");
+            cardElem.className = "uno-card " + card.color;
+            cardElem.textContent = card.value;
+            cardElem.addEventListener("click", () => { if(!this.isCurrentPlayerHuman()){ this.playCard(1, this.players[1].indexOf(card)); } });
+            opponentCardsDiv.appendChild(cardElem);
+          });
+        }
+      },
+      isCurrentPlayerHuman() {
+        return (this.mode === "bot") ? (this.currentPlayer === 0) : true;
+      },
+      getValidMoves(hand) {
+        const topCard = this.discardPile[this.discardPile.length - 1];
+        return hand.map((card, index) => { return (card.color === topCard.color || card.value === topCard.value) ? index : -1; }).filter(index => index !== -1);
+      },
+      playCard(playerIndex, cardIndex) {
+        const hand = this.players[playerIndex];
+        const card = hand[cardIndex];
+        const topCard = this.discardPile[this.discardPile.length - 1];
+        if(card.color === topCard.color || card.value === topCard.value){
+          hand.splice(cardIndex, 1);
+          this.discardPile.push(card);
+          this.updateUI();
+          if(this.checkWin()) return;
+          this.nextTurn();
+        } else {
+          alert("لا يمكنك لعب هذه البطاقة!");
+        }
+      },
+      drawCard(playerIndex) {
+        if(this.deck.length === 0){
+          const top = this.discardPile.pop();
+          this.deck = this.discardPile;
+          this.shuffle(this.deck);
+          this.discardPile = [top];
+        }
+        const card = this.deck.pop();
+        this.players[playerIndex].push(card);
+      },
+      nextTurn() {
+        this.currentPlayer = (this.currentPlayer === 0) ? 1 : 0;
+        this.updateUI();
+        if(!this.isCurrentPlayerHuman()){
+          setTimeout(() => this.botMove(), 1000);
+        }
+      },
+      botMove() {
+        const hand = this.players[1];
+        const validMoves = this.getValidMoves(hand);
+        if(validMoves.length > 0){
+          let chosenIndex;
+          if(this.difficulty === "easy"){
+            chosenIndex = validMoves[Math.floor(Math.random() * validMoves.length)];
+          } else {
+            let colorCount = {};
+            hand.forEach(card => { colorCount[card.color] = (colorCount[card.color] || 0) + 1; });
+            chosenIndex = validMoves[0];
+            let maxCount = -1;
+            validMoves.forEach(index => {
+              const card = hand[index];
+              if(colorCount[card.color] > maxCount){
+                maxCount = colorCount[card.color];
+                chosenIndex = index;
+              }
+            });
+          }
+          this.playCard(1, chosenIndex);
+        } else {
+          this.drawCard(1);
+          this.updateUI();
+          const newValid = this.getValidMoves(this.players[1]);
+          if(newValid.length > 0){
+            setTimeout(() => this.botMove(), 1000);
+          } else {
+            this.nextTurn();
+          }
+        }
+      },
+      checkWin() {
+        if(this.players[0].length === 0){
+          this.endGame("player");
+          return true;
+        } else if(this.players[1].length === 0){
+          this.endGame("opponent");
+          return true;
+        }
+        return false;
+      },
+      endGame(winner) {
+        let message = "";
+        if(this.mode === "bot"){
+          message = (winner === "player") ? "فزت!" : "خسرت!";
+        } else {
+          message = (winner === "player") ? "فاز اللاعب 1!" : "فاز اللاعب 2!";
+        }
+        const overlay = document.getElementById("resultOverlay");
+        overlay.classList.add("show");
+      },
+      hideResult() { document.getElementById("resultOverlay").classList.remove("show"); }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => { UNOGame.init(); });
+  </script>
+</body>
+</html>
