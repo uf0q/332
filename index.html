@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>منصة الألعاب - XO و UNO</title>
+  <title>منصة الألعاب - XO و UNO و Dots & Boxes</title>
+  <!-- خط Roboto المستخدم في الموقع الأساسي -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- إضافة Font Awesome (مطلوب للعبة برا السالفة) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
   <style>
-    /* أنماط عامة */
+    /* ------------------ أنماط الموقع الأساسي ------------------ */
     :root {
       --primary: #2c3e50;
       --secondary: #3498db;
@@ -216,7 +219,7 @@
       cursor: pointer;
     }
     #uno-back:hover { opacity: 0.9; }
-    /* تعديل ترتيب قسم UNO: وضع الخصمين على الجانبين وزر السحب في الوسط */
+    /* ترتيب لعبة UNO مع سحب الأوراق في الوسط */
     #uno-hands {
       display: flex;
       justify-content: space-around;
@@ -224,9 +227,7 @@
       margin-top: 20px;
       flex-wrap: nowrap;
     }
-    #opponent-hand, #player-hand {
-      width: 30%;
-    }
+    #opponent-hand, #player-hand { width: 30%; }
     #uno-deck-center {
       width: 30%;
       display: flex;
@@ -281,16 +282,103 @@
     .blue { background: linear-gradient(145deg, #82b1ff, #448aff); color: white; }
     .green { background: linear-gradient(145deg, #b9f6ca, #69f0ae); color: white; }
     .yellow { background: linear-gradient(145deg, #ffff8d, #ffea00); color: black; }
-
-    /* استجابة الأجهزة الصغيرة */
-    @media screen and (max-width: 768px) {
-      body { flex-direction: column; }
+    
+    /* أنماط لعبة Dots & Boxes */
+    #dots-boxes {
+      --grid-color: #2c3e50;
+      --bg-color: #f8f9fa;
+      --text-color: #212529;
+      --player1-color: #e74c3c;
+      --player2-color: #3498db;
+      --transition: all 0.3s ease;
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 1rem auto;
+    }
+    #dots-boxes .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    #dots-boxes .title {
+      color: var(--grid-color);
+      margin: 0 0 1rem;
+      font-size: 2.2rem;
+    }
+    #dots-boxes .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    #dots-boxes .color-picker {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #dots-boxes .color-input {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--grid-color);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #dots-boxes .mode-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    #dots-boxes .btn {
+      background: var(--grid-color);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #dots-boxes .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    #dots-boxes #gameBoard {
+      border: 3px solid var(--grid-color);
+      border-radius: 12px;
+      background: white;
+      margin: 1.5rem auto;
+      display: block;
+    }
+    #dots-boxes .current-player {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: rgba(44, 62, 80, 0.1);
+      border-radius: 8px;
+    }
+    #dots-boxes .dot {
+      fill: var(--grid-color);
+    }
+    #dots-boxes .line {
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+    #dots-boxes .box {
+      fill-opacity: 0.3;
+    }
+    @media (max-width: 768px) {
       .sidebar {
         width: 100%;
         height: auto;
         position: relative;
-        top: 0;
-        right: 0;
         padding: 10px;
       }
       .main-content {
@@ -306,6 +394,111 @@
       #opponent-hand, #player-hand, #uno-deck-center {
         width: 100%;
       }
+      /* استجابة Dots & Boxes */
+      #dots-boxes {
+        padding: 1rem;
+      }
+      #dots-boxes .title {
+        font-size: 1.8rem;
+      }
+      #dots-boxes .btn {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+      }
+    }
+  </style>
+  <style>
+    /* ------------------ أنماط لعبة "برا السالفة" ------------------ */
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap');
+    #bra-salfa {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      color: #333;
+      direction: rtl;
+    }
+    #bra-salfa h1 { margin-bottom: 10px; }
+    #bra-salfa p { margin: 10px 0; }
+    #bra-salfa .screen { display: none; padding: 20px; text-align: center; animation: fadeIn 0.5s ease-in-out; }
+    #bra-salfa .active { display: block; }
+    #bra-salfa form { margin-top: 20px; }
+    #bra-salfa label { font-size: 1.1em; display: block; margin: 10px 0 5px; }
+    #bra-salfa input, 
+    #bra-salfa select, 
+    #bra-salfa button { font-size: 1em; padding: 8px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    #bra-salfa button { background-color: #5563DE; color: #fff; cursor: pointer; transition: background-color 0.3s ease; }
+    #bra-salfa button:hover { background-color: #3f4bb8; }
+    /* زر العودة على شكل أيقونة في الزاوية اليسرى العليا */
+    #bra-salfa #bs-back-to-category {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background-color: #dc3545;
+      border: none;
+      padding: 8px;
+      border-radius: 50%;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      z-index: 300;
+      font-size: 1.2em;
+      line-height: 1;
+    }
+    #bra-salfa #bs-back-to-category:hover { background-color: #c82333; }
+    /* لوحة النتائج */
+    #bra-salfa #bs-scoreboard {
+      margin-top: 60px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      font-size: 0.9em;
+      text-align: right;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #bra-salfa .next-round-btn {
+      margin-top: 20px;
+      background-color: #28a745;
+    }
+    #bra-salfa .next-round-btn:hover { background-color: #218838; }
+    #bra-salfa .box {
+      background: #fff;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    #bra-salfa .category-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    #bra-salfa .category-option {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    #bra-salfa .category-option:hover { transform: scale(1.05); }
+    #bra-salfa .category-option i {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color: #5563DE;
     }
   </style>
 </head>
@@ -316,6 +509,8 @@
     <ul>
       <li><a href="#x-o">لعبة X و O</a></li>
       <li><a href="#uno">لعبة UNO</a></li>
+      <li><a href="#dots-boxes">لعبة النقاط والمربعات</a></li>
+      <li><a href="#bra-salfa">برا السالفة</a></li>
     </ul>
   </nav>
 
@@ -348,12 +543,9 @@
             </select>
           </span>
         </div>
-        <!-- قائمة اللاعبين المتصلين في وضع الأونلاين -->
         <div id="onlinePlayers" style="display:none;">
           <h2>اللاعبون المتصلون</h2>
-          <ul id="onlinePlayersList">
-            <!-- تعبئة ديناميكية -->
-          </ul>
+          <ul id="onlinePlayersList"></ul>
         </div>
         <div id="status">دور اللاعب X</div>
         <div class="board" id="board"></div>
@@ -362,11 +554,9 @@
           <button class="btn-reset" onclick="resetScores()">إعادة ضبط النتائج</button>
         </div>
       </div>
-      <!-- طبقات الأنميشن -->
       <div id="lostOverlay" class="overlay lose">لقد خسرت!</div>
       <div id="winOverlay" class="overlay win">لقد فزت!</div>
       <div id="drawOverlay" class="overlay draw">التعادل!</div>
-      <!-- نافذة الدعوة -->
       <div id="invitationOverlay">تم إرسال الدعوة!</div>
     </section>
 
@@ -418,8 +608,143 @@
         </div>
       </div>
     </section>
-  </main>
 
+    <!-- قسم لعبة Dots & Boxes -->
+    <section id="dots-boxes" class="game-container">
+      <div class="header">
+        <h1 class="title">لعبة النقاط والمربعات</h1>
+      </div>
+      <div class="controls">
+        <div class="color-picker">
+          <label>لون اللاعب 1:</label>
+          <input type="color" id="player1Color" class="color-input" value="#e74c3c">
+        </div>
+        <div class="color-picker">
+          <label>لون اللاعب 2:</label>
+          <input type="color" id="player2Color" class="color-input" value="#3498db">
+        </div>
+      </div>
+      <div class="mode-buttons">
+        <button class="btn" onclick="startGameDots('human')">
+          <span>👥</span> لاعب ضد لاعب
+        </button>
+        <button class="btn" onclick="startGameDots('bot')">
+          <span>🤖</span> لاعب ضد كمبيوتر
+        </button>
+      </div>
+      <svg id="gameBoard" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="current-player">
+        دور اللاعب الحالي: <span id="currentPlayer" style="font-weight: bold;">1</span>
+      </div>
+    </section>
+
+    <!-- قسم لعبة برا السالفة -->
+    <section id="bra-salfa" class="game-container">
+      <!-- زر العودة على شكل أيقونة في الزاوية اليسرى العليا -->
+      <button id="bs-back-to-category"><i class="fas fa-arrow-left"></i></button>
+      <!-- لوحة النتائج الخاصة باللعبة -->
+      <div id="bs-scoreboard">
+        <div id="bs-score-content"></div>
+      </div>
+      <!-- شاشة اختيار الفئة -->
+      <div id="bs-category-screen" class="screen active">
+        <div class="box">
+          <h1>اختر فئة العنصر</h1>
+          <div id="bs-category-options" class="category-grid">
+            <!-- سيتم إنشاء خيارات الفئات هنا -->
+          </div>
+        </div>
+      </div>
+      <!-- شاشة إعداد اللعبة مع تعديل عدد اللاعبين من 2 إلى 20 -->
+      <div id="bs-setup-screen" class="screen">
+        <div class="box">
+          <h1>إعداد اللعبة</h1>
+          <form id="bs-setup-form">
+            <div>
+              <label for="bs-numPlayers">عدد اللاعبين (2-20):</label>
+              <select id="bs-numPlayers">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+              </select>
+            </div>
+            <button type="submit">التالي</button>
+          </form>
+        </div>
+      </div>
+      <!-- شاشة إدخال أسماء اللاعبين -->
+      <div id="bs-names-screen" class="screen">
+        <div class="box">
+          <h1>أدخل أسماء اللاعبين</h1>
+          <form id="bs-names-form">
+            <div id="bs-names-container">
+              <!-- سيتم إنشاء حقول الإدخال هنا -->
+            </div>
+            <button type="submit">بدء اللعبة</button>
+          </form>
+        </div>
+      </div>
+      <!-- شاشة عرض الدور لكل لاعب -->
+      <div id="bs-role-screen" class="screen">
+        <div class="box">
+          <h1>عرض الدور</h1>
+          <p id="bs-role-player-name"></p>
+          <p id="bs-role-message">اضغط الزر لعرض الدور<br>(يرجى عدم النظر للاعبين الآخرين)</p>
+          <button id="bs-reveal-role-btn">عرض الدور</button>
+          <button id="bs-next-role-btn" style="display:none;">التالي</button>
+        </div>
+      </div>
+      <!-- شاشة مرحلة الاستجواب -->
+      <div id="bs-game-screen" class="screen">
+        <div class="box">
+          <h1>مرحلة الاستجواب</h1>
+          <p id="bs-turn-info"></p>
+          <button id="bs-next-turn-btn">تخطي / التالي</button>
+          <button id="bs-go-to-vote-btn">البدء في التصويت</button>
+        </div>
+      </div>
+      <!-- شاشة التصويت -->
+      <div id="bs-vote-screen" class="screen">
+        <div class="box">
+          <h1>مرحلة التصويت</h1>
+          <form id="bs-vote-form">
+            <div id="bs-vote-options"></div>
+            <button type="submit">تصويت</button>
+          </form>
+        </div>
+      </div>
+      <!-- شاشة النتيجة -->
+      <div id="bs-result-screen" class="screen">
+        <div class="box">
+          <h1>النتيجة - الجولة <span id="bs-round-number"></span></h1>
+          <p id="bs-result-message"></p>
+          <button class="next-round-btn" id="bs-next-round-btn">جولة جديدة</button>
+          <button id="bs-restart-btn" style="margin-top:10px;">إعادة ضبط اللعبة</button>
+        </div>
+      </div>
+      <!-- شاشة الأنميشن -->
+      <div id="bs-animation-screen" class="screen" style="display:none;">
+        <div id="bs-animation-content">كشف الهوية...</div>
+      </div>
+    </section>
+  </main>
+  
   <!-- سكربت التبديل بين الأقسام -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -436,7 +761,7 @@
   
   <!-- سكربتات لعبة XO -->
   <script>
-    // المتغيرات الأساسية للعبة XO
+    // كود لعبة XO كما هو في الكود الأصلي
     let board = ['', '', '', '', '', '', '', '', ''];
     let currentPlayer = 'X';
     let gameActive = true;
@@ -928,6 +1253,355 @@
     };
     
     document.addEventListener('DOMContentLoaded', () => { UNOGame.init(); });
+  </script>
+  
+  <!-- سكربت لعبة Dots & Boxes -->
+  <script>
+    const svgDots = document.querySelector('#dots-boxes #gameBoard');
+    const dotsPlayers = {
+      1: { color: '#e74c3c', score: 0 },
+      2: { color: '#3498db', score: 0 }
+    };
+    let gridSize = 4;
+    let boxSize = 50;
+    let dotsGameMode = 'human';
+    let currentDotsPlayer = 1;
+    let isDragging = false;
+    let startDot = null;
+    const dotsGameState = {
+      dots: [],
+      horizontalLines: [],
+      verticalLines: [],
+      boxes: []
+    };
+    
+    function initDotsGame() {
+      svgDots.innerHTML = '';
+      const size = gridSize * boxSize;
+      svgDots.setAttribute('width', size);
+      svgDots.setAttribute('height', size);
+      for(let i = 0; i < gridSize; i++) {
+        for(let j = 0; j < gridSize; j++) {
+          const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          dot.classList.add('dot');
+          dot.setAttribute('cx', i * boxSize + boxSize/2);
+          dot.setAttribute('cy', j * boxSize + boxSize/2);
+          dot.setAttribute('r', 4);
+          svgDots.appendChild(dot);
+        }
+      }
+      dotsGameState.horizontalLines = Array(gridSize).fill().map(() => Array(gridSize-1).fill(false));
+      dotsGameState.verticalLines = Array(gridSize-1).fill().map(() => Array(gridSize).fill(false));
+      dotsGameState.boxes = Array(gridSize-1).fill().map(() => Array(gridSize-1).fill(0));
+    }
+    
+    function drawLine(x1, y1, x2, y2, color) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.classList.add('line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', color);
+      svgDots.appendChild(line);
+    }
+    
+    function fillBox(x, y, color) {
+      const box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      box.classList.add('box');
+      box.setAttribute('x', x * boxSize + boxSize/2 + 2);
+      box.setAttribute('y', y * boxSize + boxSize/2 + 2);
+      box.setAttribute('width', boxSize - 4);
+      box.setAttribute('height', boxSize - 4);
+      box.setAttribute('fill', color);
+      svgDots.appendChild(box);
+    }
+    
+    function updateCurrentDotsPlayer() {
+      const currentEl = document.querySelector('#dots-boxes .current-player span');
+      currentEl.textContent = currentDotsPlayer;
+      currentEl.style.color = dotsPlayers[currentDotsPlayer].color;
+    }
+    
+    function startGameDots(mode) {
+      dotsGameMode = mode;
+      dotsPlayers[1].color = document.getElementById('player1Color').value;
+      dotsPlayers[2].color = document.getElementById('player2Color').value;
+      currentDotsPlayer = 1;
+      initDotsGame();
+      updateCurrentDotsPlayer();
+    }
+    
+    svgDots.addEventListener('mousedown', e => {
+      const rect = svgDots.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      startDot = { x: Math.floor(x / boxSize), y: Math.floor(y / boxSize) };
+      isDragging = true;
+    });
+    
+    svgDots.addEventListener('mouseup', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      const rect = svgDots.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const endDot = { x: Math.floor(x / boxSize), y: Math.floor(y / boxSize) };
+      if (startDot.x === endDot.x && Math.abs(startDot.y - endDot.y) === 1) {
+        const xCoord = startDot.x * boxSize + boxSize/2;
+        const yCoord1 = Math.min(startDot.y, endDot.y) * boxSize + boxSize/2;
+        const yCoord2 = Math.max(startDot.y, endDot.y) * boxSize + boxSize/2;
+        drawLine(xCoord, yCoord1, xCoord, yCoord2, dotsPlayers[currentDotsPlayer].color);
+      } else if (startDot.y === endDot.y && Math.abs(startDot.x - endDot.x) === 1) {
+        const yCoord = startDot.y * boxSize + boxSize/2;
+        const xCoord1 = Math.min(startDot.x, endDot.x) * boxSize + boxSize/2;
+        const xCoord2 = Math.max(startDot.x, endDot.x) * boxSize + boxSize/2;
+        drawLine(xCoord1, yCoord, xCoord2, yCoord, dotsPlayers[currentDotsPlayer].color);
+      }
+    });
+  </script>
+  
+  <!-- سكربت لعبة "برا السالفة" -->
+  <script>
+    // المتغيرات الأساسية للعبة برا السالفة
+    let numPlayers, chosenItem, liarIndex;
+    let currentTurn = 0;
+    let players = [];
+    let roleIndex = 0;
+    let round = 1;
+    let scoreboard = [];
+    
+    const categories = {
+      "سيارات": ["تويوتا", "هوندا", "مرسيدس", "بي إم دبليو", "فورد", "شيفروليه", "نيسان", "لكزس", "أودي", "بورش", "لامبورغيني", "فيراري", "ميتسوبيشي", "سوبارو"],
+      "حيوانات": ["أسد", "فيل", "نمر", "زرافة", "دب", "قرد", "نمس", "ثعلب", "ذئب", "فهد", "غزال", "أرنب", "جمل", "بطريق"],
+      "أكلات عربية": ["كبسة", "منسف", "مقلوبة", "مسخن", "مجدرة", "فتة", "حمص", "تبولة", "فتوش", "شاورما", "مشاوي", "مندي", "مرق", "مطبقة"],
+      "كورة": ["ليونيل ميسي", "كريستيانو رونالدو", "نيمار جونيور", "محمد صلاح", "كيليان مبابي", "أنطوان غريزمان", "لوكا مودريتش", "كيفين دي بروين", "سيرجيو أجويرو"],
+      "فواكه": ["تفاح", "موز", "برتقال", "عنب", "كيوي", "أناناس", "مانجو", "فراولة", "بطيخ", "شمام", "رمان", "خوخ", "أفوكادو"],
+      "شخصيات كرتون في سبيستون": ["مغامر", "سوبر بطل", "فهد", "أمجد", "راشد", "سلمان", "عمرو", "أيمن"],
+      "ألعاب": ["شطرنج", "طاولة", "بلياردو", "كرة السلة", "كرة القدم", "تنس", "هوكي", "بوكيمون", "ماريو", "فيفا", "أساسنز كريد", "ماينكرافت"],
+      "أنمي": ["ناروتو", "ون بيس", "دراجون بول", "هجوم العمالقة", "هايكيو", "بليتش", "المحقق كونان", "كود غياس", "ديث نوت", "فول ميتال اليس"]
+    };
+    
+    const categoryIcons = {
+      "سيارات": "fa-car",
+      "حيوانات": "fa-paw",
+      "أكلات عربية": "fa-utensils",
+      "كورة": "fa-futbol",
+      "فواكه": "fa-apple-alt",
+      "شخصيات كرتون في سبيستون": "fa-tv",
+      "ألعاب": "fa-gamepad",
+      "أنمي": "fa-film"
+    };
+    
+    function updateScoreboard() {
+      let boardContent = document.getElementById("bs-score-content");
+      let html = "<strong>النتائج:</strong><br>";
+      players.forEach((name, index) => {
+        html += `${name}: ${scoreboard[index] || 0} نقطة<br>`;
+      });
+      boardContent.innerHTML = html;
+    }
+    
+    function switchScreen(fromId, toId) {
+      document.getElementById(fromId).classList.remove("active");
+      document.getElementById(toId).classList.add("active");
+    }
+    
+    function generateCategoryOptions() {
+      const container = document.getElementById("bs-category-options");
+      container.innerHTML = "";
+      for (let cat in categories) {
+        let div = document.createElement("div");
+        div.classList.add("category-option");
+        div.setAttribute("data-category", cat);
+        let icon = document.createElement("i");
+        icon.classList.add("fas", categoryIcons[cat]);
+        div.appendChild(icon);
+        let span = document.createElement("span");
+        span.innerText = cat;
+        div.appendChild(span);
+        div.addEventListener("click", function() {
+          let items = categories[cat];
+          let randomIndex = Math.floor(Math.random() * items.length);
+          chosenItem = items[randomIndex];
+          console.log("الفئة:", cat, "العنصر المختار:", chosenItem);
+          switchScreen("bs-category-screen", "bs-setup-screen");
+        });
+        container.appendChild(div);
+      }
+    }
+    
+    document.getElementById("bs-setup-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      numPlayers = parseInt(document.getElementById("bs-numPlayers").value);
+      switchScreen("bs-setup-screen", "bs-names-screen");
+      generateNameInputs();
+    });
+    
+    function generateNameInputs() {
+      const container = document.getElementById("bs-names-container");
+      container.innerHTML = "";
+      for(let i = 0; i < numPlayers; i++){
+        let div = document.createElement("div");
+        let label = document.createElement("label");
+        label.innerText = "اسم اللاعب " + (i + 1) + ":";
+        let input = document.createElement("input");
+        input.type = "text";
+        input.required = true;
+        input.id = "bs-playerName" + i;
+        div.appendChild(label);
+        div.appendChild(input);
+        container.appendChild(div);
+      }
+    }
+    
+    document.getElementById("bs-names-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      players = [];
+      scoreboard = [];
+      for(let i = 0; i < numPlayers; i++){
+        let name = document.getElementById("bs-playerName" + i).value.trim();
+        if(name === ""){
+          alert("الرجاء إدخال جميع أسماء اللاعبين.");
+          return;
+        }
+        players.push(name);
+        scoreboard.push(0);
+      }
+      updateScoreboard();
+      liarIndex = Math.floor(Math.random() * numPlayers);
+      console.log("اللاعب الذي لا يعرف الشيء:", players[liarIndex]);
+      switchScreen("bs-names-screen", "bs-role-screen");
+      roleIndex = 0;
+      updateRoleScreen();
+    });
+    
+    // تعديل حدث زر العودة ليعيد عرض شاشة اختيار الفئة عند النقر عليه
+    document.getElementById("bs-back-to-category").addEventListener("click", function() {
+      document.querySelectorAll("#bra-salfa .screen").forEach(screen => screen.classList.remove("active"));
+      document.getElementById("bs-category-screen").classList.add("active");
+    });
+    
+    function updateRoleScreen() {
+      if(roleIndex >= players.length) {
+        switchScreen("bs-role-screen", "bs-game-screen");
+        currentTurn = 0;
+        updateTurnInfo();
+        return;
+      }
+      document.getElementById("bs-role-player-name").innerText = "دور اللاعب: " + players[roleIndex];
+      document.getElementById("bs-role-message").innerHTML = "اضغط الزر لعرض الدور<br>(يرجى عدم النظر للاعبين الآخرين)";
+      document.getElementById("bs-reveal-role-btn").style.display = "inline-block";
+      document.getElementById("bs-next-role-btn").style.display = "none";
+    }
+    
+    document.getElementById("bs-reveal-role-btn").addEventListener("click", function() {
+      let messageElem = document.getElementById("bs-role-message");
+      if(roleIndex === liarIndex) {
+        messageElem.innerText = "حاول معرفت الشيء";
+      } else {
+        messageElem.innerText = "الشيء هو: " + chosenItem;
+      }
+      document.getElementById("bs-reveal-role-btn").style.display = "none";
+      document.getElementById("bs-next-role-btn").style.display = "inline-block";
+    });
+    
+    document.getElementById("bs-next-role-btn").addEventListener("click", function() {
+      roleIndex++;
+      updateRoleScreen();
+    });
+    
+    function updateTurnInfo() {
+      let askerIndex = currentTurn % numPlayers;
+      let targetIndex = (currentTurn + 1) % numPlayers;
+      document.getElementById("bs-turn-info").innerText = players[askerIndex] + " يسأل " + players[targetIndex] + ".";
+    }
+    
+    document.getElementById("bs-next-turn-btn").addEventListener("click", function() {
+      currentTurn++;
+      updateTurnInfo();
+    });
+    
+    document.getElementById("bs-go-to-vote-btn").addEventListener("click", function() {
+      switchScreen("bs-game-screen", "bs-vote-screen");
+      setupVoting();
+    });
+    
+    function setupVoting() {
+      let voteDiv = document.getElementById("bs-vote-options");
+      voteDiv.innerHTML = "";
+      players.forEach((player, index) => {
+        let label = document.createElement("label");
+        let radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "bs-vote";
+        radio.value = index;
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(" " + player));
+        voteDiv.appendChild(label);
+        voteDiv.appendChild(document.createElement("br"));
+      });
+    }
+    
+    document.getElementById("bs-vote-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let voteInput = document.querySelector('input[name="bs-vote"]:checked');
+      if(!voteInput) {
+        alert("الرجاء اختيار لاعب للتصويت.");
+        return;
+      }
+      let votedIndex = parseInt(voteInput.value);
+      switchScreen("bs-vote-screen", "bs-result-screen");
+      document.getElementById("bs-round-number").innerText = round;
+      let resultMsg = "";
+      if(votedIndex === liarIndex) {
+        resultMsg = "تهانينا! لقد كشفتم اللاعب " + players[liarIndex] + " الذي لا يعرف الشيء.";
+        players.forEach((player, idx) => {
+          if(idx !== liarIndex) scoreboard[idx]++;
+        });
+      } else {
+        resultMsg = "خطأ! تم التصويت على " + players[votedIndex] + ". اللاعب الذي لا يعرف الشيء هو " + players[liarIndex] + ".";
+        scoreboard[liarIndex]++;
+      }
+      document.getElementById("bs-result-message").innerText = resultMsg;
+      updateScoreboard();
+      playAnimation();
+    });
+    
+    document.getElementById("bs-next-round-btn").addEventListener("click", function() {
+      round++;
+      liarIndex = Math.floor(Math.random() * numPlayers);
+      console.log("الجولة " + round + " - اللاعب الذي لا يعرف الشيء:", players[liarIndex]);
+      roleIndex = 0;
+      switchScreen("bs-result-screen", "bs-role-screen");
+      document.getElementById("bs-reveal-role-btn").style.display = "inline-block";
+      document.getElementById("bs-next-role-btn").style.display = "none";
+    });
+    
+    document.getElementById("bs-restart-btn").addEventListener("click", function() {
+      location.reload();
+    });
+    
+    function playAnimation() {
+      let animScreen = document.getElementById("bs-animation-screen");
+      let content = document.getElementById("bs-animation-content");
+      animScreen.style.display = "flex";
+      content.innerText = "كشف الهوية";
+      let dots = 0;
+      let interval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        content.innerText = "كشف الهوية" + ".".repeat(dots);
+      }, 500);
+      setTimeout(() => {
+        clearInterval(interval);
+        content.innerText = "اللاعب " + players[liarIndex] + " هو الذي لا يعرف الشيء!";
+        setTimeout(() => {
+          animScreen.style.display = "none";
+        }, 3000);
+      }, 3000);
+    }
+    
+    generateCategoryOptions();
   </script>
 </body>
 </html>
